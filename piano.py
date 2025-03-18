@@ -22,16 +22,21 @@ notes_sounds = {
 # Define key positions (Only 5 keys)
 keys = [
     (100, 400, "C"),
-    (200, 400, "D"),
-    (300, 400, "E"),
-    (400, 400, "F"),
-    (500, 400, "G"),
+    (220, 400, "D"),
+    (340, 400, "E"),
+    (460, 400, "F"),
+    (580, 400, "G"),
 ]
 
 # Function to draw piano keys on screen
-def draw_piano(frame):
+def draw_piano(frame, active_note=None):
     for x, y, note in keys:
-        cv2.rectangle(frame, (x, y), (x + 100, y + 200), (255, 255, 255), -1)  # White keys
+        color = (255, 255, 255)  # Default white keys
+        if note == active_note:
+            color = (0, 255, 0)  # Highlight active key in green
+        
+        cv2.rectangle(frame, (x, y), (x + 100, y + 200), color, -1)  # White key
+        cv2.rectangle(frame, (x, y), (x + 100, y + 200), (0, 0, 0), 3)  # Black outline
         cv2.putText(frame, note, (x + 30, y + 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
 # Function to get fingertip position
@@ -65,6 +70,8 @@ while cap.isOpened():
     results = hands.process(rgb_frame)
 
     frame_height, frame_width, _ = frame.shape
+    active_note = None
+    
     draw_piano(frame)  # Draw virtual piano keys
 
     if results.multi_hand_landmarks:
@@ -79,8 +86,10 @@ while cap.isOpened():
             note = detect_pressed_key(x, y)
             if note:
                 play_sound(note)
+                active_note = note
                 cv2.putText(frame, f"Playing: {note}", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
+    
+    draw_piano(frame, active_note)  # Update UI with active key
     cv2.imshow("Virtual Piano", frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):  # Press 'q' to exit
