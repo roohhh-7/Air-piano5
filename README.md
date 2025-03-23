@@ -44,5 +44,5 @@ _(Add a GIF or Screenshot Here)_
 - 🎶 **Allow custom sound mapping**
 
 
----
+
 Made with ❤️ by rohit
